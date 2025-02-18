@@ -1,42 +1,60 @@
-import nx from '@nx/eslint-plugin';
+import nx from "@nx/eslint-plugin";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 
 export default [
-  ...nx.configs['flat/base'],
-  ...nx.configs['flat/typescript'],
-  ...nx.configs['flat/javascript'],
+  ...nx.configs["flat/base"],
+  ...nx.configs["flat/typescript"],
+  ...nx.configs["flat/javascript"],
   {
-    ignores: ['**/dist'],
+    ignores: ["**/dist"],
   },
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
     rules: {
-      '@nx/enforce-module-boundaries': [
-        'error',
+      "@nx/enforce-module-boundaries": [
+        "error",
         {
           enforceBuildableLibDependency: true,
-          allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?js$'],
+          allow: ["^.*/eslint(\\.base)?\\.config\\.[cm]?js$"],
           depConstraints: [
             {
-              sourceTag: '*',
-              onlyDependOnLibsWithTags: ['*'],
+              sourceTag: "*",
+              onlyDependOnLibsWithTags: ["*"],
             },
           ],
         },
       ],
     },
   },
+  // Override or add rules here
   {
     files: [
-      '**/*.ts',
-      '**/*.tsx',
-      '**/*.cts',
-      '**/*.mts',
-      '**/*.js',
-      '**/*.jsx',
-      '**/*.cjs',
-      '**/*.mjs',
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.cts",
+      "**/*.mts",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.cjs",
+      "**/*.mjs",
     ],
-    // Override or add rules here
-    rules: {},
+    plugins: {
+      "simple-import-sort": simpleImportSort,
+    },
+    rules: {
+      "simple-import-sort/imports": [
+        "error",
+        {
+          groups: [
+            ["^\\u0000"],
+            ["^@?\\w"],
+            ["^@appupapp/"],
+            ["^src/"],
+            ["^\\."],
+          ],
+        },
+      ],
+      "simple-import-sort/exports": "error",
+    },
   },
 ];

@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { registerRootComponent } from 'expo';
+import { registerRootComponent } from "expo";
+import * as React from "react";
 
-import { Router } from './router';
+import { Router } from "./router";
 
-const App = () => {
+export const App = () => {
   return <Router />;
 };
 
