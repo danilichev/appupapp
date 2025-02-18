@@ -14,7 +14,9 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@appupapp/mobile-ui-restyle": ["libs/mobile-ui-restyle/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
