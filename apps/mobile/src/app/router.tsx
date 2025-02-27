@@ -3,16 +3,19 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { Text, View } from "react-native";
 
-import { Foo } from "@appupapp/mobile-ui-restyle";
-
-import { Boo } from "src/components/boo";
+import { Button } from "@appupapp/mobile-ui";
 
 function HomeScreen() {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+    <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
       <Text>Home Screen</Text>
-      <Foo />
-      <Boo />
+      <Button
+        isLoading
+        loadingPosition="end"
+        onPress={() => console.log("Pressed")}
+      >
+        <Text>{"<"}</Text> Boo
+      </Button>
     </View>
   );
 }

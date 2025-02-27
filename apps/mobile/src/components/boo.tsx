@@ -1,15 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
-export const Boo = () => (
-  <View style={styles.root}>
-    <Text>Boo</Text>
-  </View>
-);
+export const Boo = () => <Text>Boo</Text>;
 
 const styles = StyleSheet.create({
-  root: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-  },
+  container: {},
 });
