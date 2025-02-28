@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useMemo } from "react";
+import { FC, ReactNode, useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
   StyleProp,
@@ -7,46 +7,70 @@ import {
   ViewStyle,
 } from "react-native";
 
+import { colors } from "../../theme/colors";
 import { Pressable } from "../pressable";
 
+type ButtonChild = ReactNode | FC<{ color?: string }>;
+
 export type BaseButtonProps = {
-  children?: ReactNode;
+  color?: string;
+  children?: ButtonChild | ButtonChild[];
   containerStyle?: StyleProp<ViewStyle>;
   isDisabled?: boolean;
   isLoading?: boolean;
-  loadingComponent?: ReactNode;
+  loadingComponent?: ButtonChild;
   loadingPosition?: "start" | "center" | "end";
   onPress?: () => void;
   textStyle?: StyleProp<ViewStyle>;
 };
 
 export const BaseButton = ({
+  color = colors.primaryForeground,
   children,
   containerStyle,
   isDisabled,
   isLoading,
-  loadingComponent = <ActivityIndicator />,
+  loadingComponent,
   loadingPosition = "center",
   onPress,
   textStyle,
 }: BaseButtonProps) => {
   const [startComponent, centerComponent, endComponent] = useMemo(
     () =>
-      typeof children === "string"
-        ? [null, children, null]
-        : Array.isArray(children)
-        ? children
-        : [null, null, null],
+      Array.isArray(children)
+        ? ([...children, ...Array.from({ length: 3 }).fill(null)].slice(
+            0,
+            3,
+          ) as ButtonChild[])
+        : [null, children, null],
     [children],
   );
 
-  const maybeLoader = useCallback(
+  const loadingComp = useMemo(
+    () =>
+      typeof loadingComponent === "function" ? (
+        loadingComponent({ color })
+      ) : (
+        <ActivityIndicator color={color} />
+      ),
+    [color, loadingComponent],
+  );
+
+  const renderChild = useCallback(
     (
       position: Required<BaseButtonProps>["loadingPosition"],
-      component?: ReactNode,
+      component?: ButtonChild,
     ) =>
-      isLoading && loadingPosition === position ? loadingComponent : component,
-    [isLoading, loadingComponent, loadingPosition],
+      isLoading && loadingPosition === position ? (
+        loadingComp
+      ) : typeof component === "function" ? (
+        component({ color })
+      ) : typeof component === "string" ? (
+        <Text style={[styles.text, textStyle, { color }]}>{component}</Text>
+      ) : (
+        component
+      ),
+    [color, isLoading, loadingComp, loadingPosition, textStyle],
   );
 
   return (
@@ -55,21 +79,22 @@ export const BaseButton = ({
       onPress={onPress}
       style={[styles.container, containerStyle]}
     >
-      {maybeLoader("start", startComponent)}
-      {maybeLoader(
-        "center",
-        typeof centerComponent === "string" ? (
-          <Text style={[styles.title, textStyle]}>{centerComponent}</Text>
-        ) : (
-          centerComponent
-        ),
-      )}
-      {maybeLoader("end", endComponent)}
+      {renderChild("start", startComponent)}
+      {renderChild("center", centerComponent)}
+      {renderChild("end", endComponent)}
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { alignItems: "center", flexDirection: "row", padding: 8 },
-  title: { fontSize: 16 },
+  container: {
+    alignItems: "center",
+    backgroundColor: colors.primary,
+    flexDirection: "row",
+    padding: 8,
+  },
+  text: {
+    color: colors.primaryForeground,
+    fontSize: 16,
+  },
 });
