@@ -1,5 +1,7 @@
-import { Feather } from "@expo/vector-icons";
+import { Icon, IconProps } from "../icon";
+import { ButtonChildProps } from "./base";
 
-export const ButtonIcon = () => (
-  <Feather name="arrow-left" size={24} color="black" />
-);
+export const renderButtonIcon =
+  (props: IconProps) =>
+  ({ color }: ButtonChildProps) =>
+    <Icon {...props} color={props.color || color} />;

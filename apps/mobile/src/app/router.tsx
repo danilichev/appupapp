@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { Text, View } from "react-native";
 
-import { Button, Icon } from "@appupapp/mobile-ui";
+import { Button } from "@appupapp/mobile-ui";
 
 function HomeScreen() {
   return (
@@ -14,7 +14,7 @@ function HomeScreen() {
         loadingPosition="end"
         onPress={() => console.log("Pressed")}
       >
-        <Icon color={"red"} name="arrow-right" />
+        Press me
       </Button>
     </View>
   );

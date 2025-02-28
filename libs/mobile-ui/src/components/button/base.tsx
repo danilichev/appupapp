@@ -10,9 +10,12 @@ import {
 import { colors } from "../../theme/colors";
 import { Pressable } from "../pressable";
 
-type ButtonChild = ReactNode | FC<{ color?: string }>;
+export type ButtonChildProps = { color?: string };
+
+export type ButtonChild = ReactNode | FC<ButtonChildProps>;
 
 export type BaseButtonProps = {
+  backgroundColor?: string;
   color?: string;
   children?: ButtonChild | ButtonChild[];
   containerStyle?: StyleProp<ViewStyle>;
@@ -25,6 +28,7 @@ export type BaseButtonProps = {
 };
 
 export const BaseButton = ({
+  backgroundColor = colors.primary,
   color = colors.primaryForeground,
   children,
   containerStyle,
@@ -36,13 +40,10 @@ export const BaseButton = ({
   textStyle,
 }: BaseButtonProps) => {
   const [startComponent, centerComponent, endComponent] = useMemo(
-    () =>
-      Array.isArray(children)
-        ? ([...children, ...Array.from({ length: 3 }).fill(null)].slice(
-            0,
-            3,
-          ) as ButtonChild[])
-        : [null, children, null],
+    () => [
+      ...(Array.isArray(children) ? children : [null, children]),
+      ...(Array.from({ length: 3 }).fill(null) as ButtonChild[]),
+    ],
     [children],
   );
 
@@ -77,7 +78,7 @@ export const BaseButton = ({
     <Pressable
       isDisabled={isDisabled || isLoading}
       onPress={onPress}
-      style={[styles.container, containerStyle]}
+      style={[styles.container, containerStyle, { backgroundColor }]}
     >
       {renderChild("start", startComponent)}
       {renderChild("center", centerComponent)}
@@ -89,7 +90,6 @@ export const BaseButton = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    backgroundColor: colors.primary,
     flexDirection: "row",
     padding: 8,
   },
