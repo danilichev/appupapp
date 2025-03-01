@@ -2,6 +2,7 @@ import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 import { Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 import { Button } from "@appupapp/mobile-ui";
 
@@ -13,7 +14,7 @@ function HomeScreen() {
         color="pink"
         loadingPosition="end"
         onPress={() => console.log("Pressed")}
-        containerStyle={{ borderRadius: 1000 }}
+        containerStyle={styles.container}
       >
         Press me
       </Button>
@@ -28,3 +29,9 @@ const RootStack = createNativeStackNavigator({
 });
 
 export const Router = createStaticNavigation(RootStack);
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "blue",
+  },
+});
