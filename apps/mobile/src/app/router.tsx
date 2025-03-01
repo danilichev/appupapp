@@ -13,6 +13,7 @@ function HomeScreen() {
         color="pink"
         loadingPosition="end"
         onPress={() => console.log("Pressed")}
+        containerStyle={{ borderRadius: 1000 }}
       >
         Press me
       </Button>
