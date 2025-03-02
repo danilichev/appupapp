@@ -1,5 +1,6 @@
+import "./theme";
+
 import { registerRootComponent } from "expo";
-import * as React from "react";
 
 import { Router } from "./router";
 

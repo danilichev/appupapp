@@ -42,6 +42,7 @@ export default [
       "simple-import-sort": simpleImportSort,
     },
     rules: {
+      "@typescript-eslint/no-empty-object-type": "off",
       "simple-import-sort/imports": [
         "error",
         {

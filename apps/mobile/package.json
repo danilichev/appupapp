@@ -37,7 +37,12 @@
     "react-native-screens": "*",
     "react-native-safe-area-context": "*",
     "@react-navigation/elements": "*",
-    "@react-navigation/native-stack": "*"
+    "@react-navigation/native-stack": "*",
+    "react-native-unistyles": "*",
+    "@expo/vector-icons": "*",
+    "expo-build-properties": "*",
+    "react-native-edge-to-edge": "*",
+    "react-native-nitro-modules": "*"
   },
   "devDependencies": {}
 }
