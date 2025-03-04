@@ -1,3 +1,4 @@
+import { createContext, useMemo } from "react";
 import { StyleSheet } from "react-native-unistyles";
 
 import { Theme } from "../../theme";
@@ -8,22 +9,30 @@ export type ButtonProps = BaseButtonProps & {
   variant?: "outline" | "primary" | "secondary";
 };
 
+export const ButtonContext = createContext<
+  Pick<ButtonProps, "color" | "size" | "variant">
+>({});
+
 export const Button = ({
-  containerStyle,
   size = "md",
+  style,
   textStyle,
   variant = "primary",
   ...rest
 }: ButtonProps) => {
   styles.useVariants({ size, variant });
 
+  const color = useMemo(() => rest.color || styles.text.color, [rest.color]);
+
   return (
-    <BaseButton
-      {...rest}
-      color={styles.text.color}
-      containerStyle={[styles.container, containerStyle]}
-      textStyle={[styles.text, textStyle]}
-    />
+    <ButtonContext.Provider value={{ color, size, variant }}>
+      <BaseButton
+        {...rest}
+        color={color}
+        style={[styles.container, style]}
+        textStyle={[styles.text, textStyle]}
+      />
+    </ButtonContext.Provider>
   );
 };
 
@@ -34,20 +43,20 @@ const styles = StyleSheet.create((theme: Theme) => ({
         lg: {
           borderRadius: theme.radii.md,
           gap: theme.spaces.lg,
-          paddingHorizontal: theme.spaces.xl,
-          paddingVertical: theme.spaces.lg,
+          paddingHorizontal: theme.spaces.lg,
+          paddingVertical: theme.spaces.md,
         },
         md: {
           borderRadius: theme.radii.sm,
           gap: theme.spaces.md,
-          paddingHorizontal: theme.spaces.lg,
-          paddingVertical: theme.spaces.md,
+          paddingHorizontal: theme.spaces.md,
+          paddingVertical: theme.spaces.sm,
         },
         sm: {
           borderRadius: theme.radii.xs,
           gap: theme.spaces.sm,
-          paddingHorizontal: theme.spaces.md,
-          paddingVertical: theme.spaces.sm,
+          paddingHorizontal: theme.spaces.sm,
+          paddingVertical: theme.spaces.xs,
         },
       },
       variant: {
@@ -62,8 +71,8 @@ const styles = StyleSheet.create((theme: Theme) => ({
     },
   },
   text: {
+    fontFamily: theme.fontFamily,
     fontSize: theme.fontSizes.md,
-    fontWeight: "bold",
     variants: {
       variant: {
         outline: { color: theme.colors.primary },

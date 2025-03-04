@@ -13,27 +13,27 @@ import { colors } from "../../theme/colors";
 
 export type BaseButtonProps = {
   backgroundColor?: string;
-  color?: string;
   children?: ReactNode;
-  containerStyle?: StyleProp<ViewStyle>;
+  color?: string;
   isDisabled?: boolean;
   isLoading?: boolean;
   loadingComponent?: ReactNode;
   loadingPosition?: "start" | "center" | "end";
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
 };
 
 export const BaseButton = ({
   backgroundColor = colors.primary,
-  color = colors.primaryForeground,
   children,
-  containerStyle,
+  color = colors.primaryForeground,
   isDisabled,
   isLoading,
   loadingComponent,
   loadingPosition = "center",
   onPress,
+  style,
   textStyle,
 }: BaseButtonProps) => {
   const [startComponent, centerComponent, endComponent] = useMemo(
@@ -68,7 +68,7 @@ export const BaseButton = ({
     <Pressable
       isDisabled={isDisabled || isLoading}
       onPress={onPress}
-      style={[styles.container, { backgroundColor }, containerStyle]}
+      style={[styles.container, { backgroundColor }, style]}
     >
       {renderChild("start", startComponent)}
       {renderChild("center", centerComponent)}

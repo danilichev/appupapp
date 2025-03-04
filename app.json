@@ -1,6 +1,7 @@
 {
   "plugins": [
     "expo-build-properties",
-    "react-native-edge-to-edge"
+    "react-native-edge-to-edge",
+    "expo-font"
   ]
 }

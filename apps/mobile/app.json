@@ -5,9 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "newArchEnabled": true,
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,15 +21,33 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.valentynd.mobile"
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./src/assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-build-properties"]
+    "plugins": [
+      "expo-build-properties",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/assets/fonts/Inter-Black.ttf",
+            "./src/assets/fonts/Inter-Bold.ttf",
+            "./src/assets/fonts/Inter-ExtraBold.ttf",
+            "./src/assets/fonts/Inter-ExtraLight.ttf",
+            "./src/assets/fonts/Inter-Light.ttf",
+            "./src/assets/fonts/Inter-Medium.ttf",
+            "./src/assets/fonts/Inter-Regular.ttf",
+            "./src/assets/fonts/Inter-SemiBold.ttf",
+            "./src/assets/fonts/Inter-Thin.ttf"
+          ]
+        }
+      ]
+    ]
   }
 }

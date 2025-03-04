@@ -2,7 +2,7 @@
   "name": "mobile",
   "version": "0.0.1",
   "private": true,
-  "main": "src/app/index.tsx",
+  "main": "index.js",
   "scripts": {
     "eas-build-post-install": "cd ../../ && node tools/scripts/eas-build-post-install.mjs . apps/mobile",
     "android": "expo run:android",
@@ -42,7 +42,8 @@
     "@expo/vector-icons": "*",
     "expo-build-properties": "*",
     "react-native-edge-to-edge": "*",
-    "react-native-nitro-modules": "*"
+    "react-native-nitro-modules": "*",
+    "expo-font": "*"
   },
   "devDependencies": {}
 }
