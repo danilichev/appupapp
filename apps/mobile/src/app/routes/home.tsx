@@ -1,15 +1,15 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { Button, ButtonIcon } from "@appupapp/mobile-ui";
+import { Button, ButtonIcon, Text } from "@appupapp/mobile-ui";
 
 export const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <Button onPress={() => console.log("Pressed")} variant="outline">
+      <Text variant="h1">Log In</Text>
+      <Button onPress={() => console.log("Pressed")} variant="primary">
         <ButtonIcon name="user" /> Log In
       </Button>
-      <Text style={{ fontSize: 16, fontWeight: "bold" }}>Log In</Text>
     </View>
   );
 };

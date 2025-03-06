@@ -24,6 +24,8 @@ export const Button = ({
 
   const color = useMemo(() => rest.color || styles.text.color, [rest.color]);
 
+  console.log("color", color);
+
   return (
     <ButtonContext.Provider value={{ color, size, variant }}>
       <BaseButton
@@ -69,6 +71,7 @@ const styles = StyleSheet.create((theme: Theme) => ({
         secondary: { backgroundColor: theme.colors.secondary },
       },
     },
+    ...(theme.components.button?.container as object),
   },
   text: {
     fontFamily: theme.fontFamily,
@@ -80,5 +83,6 @@ const styles = StyleSheet.create((theme: Theme) => ({
         secondary: { color: theme.colors.secondaryForeground },
       },
     },
+    ...(theme.components.button?.text as object),
   },
 }));

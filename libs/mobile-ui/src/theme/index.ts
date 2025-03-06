@@ -1,6 +1,9 @@
+import { TextStyle } from "react-native";
+import { UnistylesValues } from "react-native-unistyles/lib/typescript/src/types";
+
 import { colors, darkColors } from "./colors";
 
-export const theme = {
+const tokens = {
   borders: {
     sm: 1,
     md: 2,
@@ -39,6 +42,41 @@ export const theme = {
     xl_4: 48,
     xl_5: 56,
     xl_6: 64,
+  },
+};
+
+export type Tokens = typeof tokens;
+
+export const theme = {
+  ...tokens,
+  components: {
+    button: {} as
+      | { container?: UnistylesValues; text?: UnistylesValues }
+      | undefined,
+    text: {
+      text: {
+        variants: {
+          size: Object.fromEntries(
+            Object.entries(tokens.fontSizes).map(([key, value]) => [
+              key,
+              { fontSize: value },
+            ]),
+          ),
+          variant: {
+            h1: { fontSize: tokens.fontSizes.xl_6 },
+            h2: { fontSize: tokens.fontSizes.xl_4 },
+            h3: { fontSize: tokens.fontSizes.xl_2 },
+            h4: { fontSize: tokens.fontSizes.xl },
+            p: { fontSize: tokens.fontSizes.md },
+          },
+        },
+      } as UnistylesValues & {
+        variants: {
+          size: Record<keyof Tokens["fontSizes"], TextStyle>;
+          variant: Record<"h1" | "h2" | "h3" | "h4" | "p", TextStyle>;
+        };
+      },
+    },
   },
 };
 
