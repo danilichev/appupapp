@@ -39,7 +39,7 @@ func addRoutes(api huma.API) {
 		Summary:     "Get a greeting",
 		Description: "Get a greeting for a person by name.",
 		Tags:        []string{"Greetings"},
-	}, func(ctx context.Context, input *struct{
+	}, func(ctx context.Context, input *struct {
 		Name string `path:"name" maxLength:"30" example:"world" doc:"Name to greet"`
 	}) (*GreetingOutput, error) {
 		resp := &GreetingOutput{}
