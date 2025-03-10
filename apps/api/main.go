@@ -6,10 +6,11 @@ import (
 	"net/http"
 
 	"github.com/danielgtaylor/huma/v2"
-
-	"github.com/danielgtaylor/huma/v2/adapters/humago"
-	_ "github.com/danielgtaylor/huma/v2/formats/cbor"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/danielgtaylor/huma/v2/humacli"
+	"github.com/go-chi/chi/v5"
+
+	_ "github.com/danielgtaylor/huma/v2/formats/cbor"
 )
 
 type Options struct {
@@ -24,8 +25,8 @@ type GreetingOutput struct {
 
 type ReviewInput struct {
 	Body struct {
-		Author string `json:"author" maxLength:"10" doc:"Author of the review"`
-		Rating int `json:"rating" minimum:"1" maximum:"5" doc:"Rating from 1 to 5"`
+		Author  string `json:"author" maxLength:"10" doc:"Author of the review"`
+		Rating  int    `json:"rating" minimum:"1" maximum:"5" doc:"Rating from 1 to 5"`
 		Message string `json:"message,omitempty" maxLength:"100" doc:"Review message"`
 	}
 }
@@ -33,11 +34,11 @@ type ReviewInput struct {
 func addRoutes(api huma.API) {
 	huma.Register(api, huma.Operation{
 		OperationID: "get-greeting",
-		Method: http.MethodGet,
-		Path: "/greeting/{name}",
-		Summary: "Get a greeting",
+		Method:      http.MethodGet,
+		Path:        "/greeting/{name}",
+		Summary:     "Get a greeting",
 		Description: "Get a greeting for a person by name.",
-		Tags: []string{"Greetings"},
+		Tags:        []string{"Greetings"},
 	}, func(ctx context.Context, input *struct{
 		Name string `path:"name" maxLength:"30" example:"world" doc:"Name to greet"`
 	}) (*GreetingOutput, error) {
@@ -47,24 +48,43 @@ func addRoutes(api huma.API) {
 	})
 
 	huma.Register(api, huma.Operation{
-		OperationID: "post-review",
-		Method: http.MethodPost,
-		Path: "/reviews",
-		Summary: "Post a review",
-		Tags: []string{"Reviews"},
+		OperationID:   "post-review",
+		Method:        http.MethodPost,
+		Path:          "/reviews",
+		Summary:       "Post a review",
+		Tags:          []string{"Reviews"},
 		DefaultStatus: http.StatusCreated,
 	}, func(ctx context.Context, i *ReviewInput) (*struct{}, error) {
-		// TODO: save review in data store.
 		return nil, nil
 	})
 }
 
 func main() {
 	cli := humacli.New(func(hooks humacli.Hooks, options *Options) {
-		router := http.NewServeMux()
-		api := humago.New(router, huma.DefaultConfig("My API", "1.0.0"))
+		router := chi.NewMux()
+		api := humachi.New(router, huma.DefaultConfig("My API", "1.0.0"))
 
 		addRoutes(api)
+
+		router.Get("/docs", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "text/html")
+			w.Write([]byte(`<!doctype html>
+		<html>
+		  <head>
+			<title>API Reference</title>
+			<meta charset="utf-8" />
+			<meta
+			  name="viewport"
+			  content="width=device-width, initial-scale=1" />
+		  </head>
+		  <body>
+			<script
+			  id="api-reference"
+			  data-url="/openapi.json"></script>
+			<script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+		  </body>
+		</html>`))
+		})
 
 		hooks.OnStart(func() {
 			fmt.Printf("Starting server on port %d...\n", options.Port)
