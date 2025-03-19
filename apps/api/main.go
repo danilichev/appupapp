@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/danielgtaylor/huma/v2/humacli"
 	"github.com/go-chi/chi/v5"
+	"github.com/golang-jwt/jwt/v5"
 
 	_ "github.com/danielgtaylor/huma/v2/formats/cbor"
 )
@@ -32,14 +34,10 @@ type ReviewInput struct {
 }
 
 func addRoutes(api huma.API) {
-	huma.Register(api, huma.Operation{
-		OperationID: "get-greeting",
-		Method:      http.MethodGet,
-		Path:        "/greeting/{name}",
-		Summary:     "Get a greeting",
-		Description: "Get a greeting for a person by name.",
-		Tags:        []string{"Greetings"},
-	}, func(ctx context.Context, input *struct {
+	grp := huma.NewGroup(api, "/v1")
+	grp1 := huma.NewGroup(grp, "")
+
+	huma.Get(grp, "/greeting_/{name}", func(ctx context.Context, input *struct {
 		Name string `path:"name" maxLength:"30" example:"world" doc:"Name to greet"`
 	}) (*GreetingOutput, error) {
 		resp := &GreetingOutput{}
@@ -47,7 +45,7 @@ func addRoutes(api huma.API) {
 		return resp, nil
 	})
 
-	huma.Register(api, huma.Operation{
+	huma.Register(grp1, huma.Operation{
 		OperationID:   "post-review",
 		Method:        http.MethodPost,
 		Path:          "/reviews",
@@ -57,6 +55,57 @@ func addRoutes(api huma.API) {
 	}, func(ctx context.Context, i *ReviewInput) (*struct{}, error) {
 		return nil, nil
 	})
+
+	usersGrp := huma.NewGroup(grp, "/users")
+	usersGrp.UseMiddleware(JWTMiddleware(api, []byte("secret")))
+	usersGrp.UseSimpleModifier(func(op *huma.Operation) {
+		op.Summary = "A summary for all operations in this group"
+		op.Tags = []string{"my-tag"}
+	})
+}
+
+type ctxKey string
+
+const userCtxKey ctxKey = "user"
+
+func JWTMiddleware(api huma.API, secret []byte) func(ctx huma.Context, next func(huma.Context)) {
+	return func(ctx huma.Context, next func(huma.Context)) {
+		authHeader := ctx.Header("Authorization")
+
+		if authHeader == "" {
+			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Missing Authorization header")
+			return
+		}
+
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Invalid Authorization header format (requires 'Bearer <token>')")
+			return
+		}
+		tokenStr := parts[1]
+
+		token, err := jwt.ParseWithClaims(tokenStr, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			}
+			return secret, nil
+		})
+
+		if err != nil {
+			huma.WriteErr(api, ctx, http.StatusUnauthorized, fmt.Sprintf("Failed to parse token: %v", err))
+			return
+		}
+
+		claims, ok := token.Claims.(*jwt.RegisteredClaims)
+		if !ok || !token.Valid {
+			huma.WriteErr(api, ctx, http.StatusUnauthorized, "Invalid or expired token")
+			return
+		}
+
+		ctx = huma.WithValue(ctx, userCtxKey, claims)
+
+		next(ctx)
+	}
 }
 
 func main() {
