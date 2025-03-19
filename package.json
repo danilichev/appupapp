@@ -34,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^9.8.0",
     "@expo/cli": "~0.21.8",
+    "@nx-go/nx-go": "^3.3.1",
     "@nx/eslint": "20.4.4",
     "@nx/eslint-plugin": "20.4.4",
     "@nx/expo": "20.4.4",
