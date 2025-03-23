@@ -1,10 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/MarceloPetrucio/go-scalar-api-reference"
+	"apps/api/internal/server/handlers"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -12,10 +12,7 @@ import (
 func (s *Server) RegisterRoutes() http.Handler {
 	e := echo.New()
 
-	// Register middleware
 	s.registerMiddleware(e)
-
-	// Register routes
 	s.registerRoutes(e)
 
 	return e
@@ -35,24 +32,8 @@ func (s *Server) registerMiddleware(e *echo.Echo) {
 
 func (s *Server) registerRoutes(e *echo.Echo) {
 	e.GET("/", s.HelloWorldHandler)
-	e.GET("/docs", s.docsHandler)
-	e.GET("/health", s.healthHandler)
-}
-
-func (s *Server) docsHandler(c echo.Context) error {
-	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-		SpecURL: "./openapi.yaml",
-		CustomOptions: scalar.CustomOptions{
-			PageTitle: "Blog API",
-		},
-	})
-
-	if err != nil {
-		fmt.Printf("%v", err)
-		return c.String(http.StatusInternalServerError, "Error generating API reference")
-	}
-
-	return c.HTML(http.StatusOK, htmlContent)
+	e.GET("/docs", handlers.DocsHandler)
+	e.GET("/health", handlers.HealthHandler(s.db))
 }
 
 func (s *Server) HelloWorldHandler(c echo.Context) error {
@@ -61,8 +42,4 @@ func (s *Server) HelloWorldHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, resp)
-}
-
-func (s *Server) healthHandler(c echo.Context) error {
-	return c.JSON(http.StatusOK, s.db.Health())
 }
