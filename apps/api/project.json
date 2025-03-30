@@ -18,7 +18,7 @@
       "command": "cd {projectRoot} && make docker-run"
     },
     "gen": {
-      "command": "cd {projectRoot}/tools && go generate"
+      "command": "cd {projectRoot}/internal/api && go generate"
     },
     "lint": {
       "executor": "@nx-go/nx-go:lint"
