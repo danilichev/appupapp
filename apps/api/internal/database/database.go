@@ -12,6 +12,7 @@ import (
 
 type Service interface {
 	Close() error
+	GetDB() *pgxpool.Pool
 	Health() map[string]string
 }
 
@@ -56,6 +57,10 @@ func (s *service) Close() error {
 	log.Printf("Disconnected from database: %s", database)
 	s.db.Close()
 	return nil
+}
+
+func (s *service) GetDB() *pgxpool.Pool {
+	return s.db
 }
 
 func (s *service) Health() map[string]string {

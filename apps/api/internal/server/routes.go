@@ -6,7 +6,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"apps/api/internal/api"
 	"apps/api/internal/handlers"
+	"apps/api/internal/storage"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -31,7 +33,25 @@ func (s *Server) registerMiddleware(e *echo.Echo) {
 }
 
 func (s *Server) registerRoutes(e *echo.Echo) {
-	e.GET("/", handlers.HelloHandler)
 	e.GET("/docs", handlers.DocsHandler)
-	e.GET("/health", handlers.HealthHandler(s.db))
+
+	db := s.db.GetDB()
+
+	postStore := storage.NewPostStorage(db)
+
+	commentHandler := handlers.NewCommentHandler()
+	postHandler := handlers.NewPostHandler(postStore)
+	userHandler := handlers.NewUserHandler()
+
+	combinedHandler := struct {
+		*handlers.CommentHandler
+		*handlers.PostHandler
+		*handlers.UserHandler
+	}{
+		commentHandler,
+		postHandler,
+		userHandler,
+	}
+
+	api.RegisterHandlersWithBaseURL(e, combinedHandler, "api/v1")
 }

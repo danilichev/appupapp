@@ -1,7 +1,6 @@
 package: api
 generate:
   echo-server: true
-  embedded-spec: true
   models: true
 output: ./api.go
 output-options:
