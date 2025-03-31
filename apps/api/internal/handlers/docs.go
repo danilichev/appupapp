@@ -10,7 +10,7 @@ import (
 
 func DocsHandler(c echo.Context) error {
 	htmlContent, err := scalar.ApiReferenceHTML(&scalar.Options{
-		SpecURL: "./openapi.yaml",
+		SpecURL: "./internal/api/api.yaml",
 		CustomOptions: scalar.CustomOptions{
 			PageTitle: "Blog API",
 		},
