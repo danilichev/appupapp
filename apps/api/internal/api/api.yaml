@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: AppUpApp API
+  version: 1.0.0
+  description: API for fun.
+servers:
+- url: https://api.example.com/v1
+  description: Production server
+- url: http://localhost:8080/api/v1
+  description: Local server
+
+security:
+- BearerAuth: []
+
+paths:
+  /auth/login: { $ref: './paths/auth.yaml#/authLogin' }
+  /auth/refresh: { $ref: './paths/auth.yaml#/authRefresh' }
+  /auth/register: { $ref: './paths/auth.yaml#/authRegister' }
+  /ping: { $ref: './paths/ping.yaml#/ping' }
+  /users/me: { $ref: './paths/users.yaml#/usersMe' }
+
+components:
+  securitySchemes:
+    BearerAuth: { $ref: './securitySchemes/BearerAuth.yaml' }
+  schemas:
+    AuthToken: { $ref: './schemas/AuthToken.yaml' }
+    GeneralError: { $ref: './schemas/GeneralError.yaml' }
+    LoginRequest: { $ref: './schemas/LoginRequest.yaml' }
+    RegisterRequest: { $ref: './schemas/RegisterRequest.yaml' }
+    User: { $ref: './schemas/User.yaml' }
+  responses:
+    GeneralError:
+      description: A general error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralError'

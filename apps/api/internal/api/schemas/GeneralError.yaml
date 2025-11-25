@@ -1,0 +1,12 @@
+type: object
+required:
+- message
+properties:
+  fieldErrors:
+    type: object
+    additionalProperties:
+      type: string
+    description: Validation errors for specific fields
+  message:
+    type: string
+    description: A description of the error

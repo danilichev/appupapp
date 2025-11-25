@@ -1,0 +1,568 @@
+openapi: 3.0.3
+info:
+  title: AppUpApp API
+  version: 1.0.0
+  description: API for fun.
+servers:
+- url: https://api.example.com/v1
+  description: Production server
+- url: http://localhost:8080/api/v1
+  description: Local server
+security:
+- BearerAuth: []
+paths:
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Log in user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        default:
+          $ref: '#/components/responses/GeneralError'
+  /auth/refresh:
+    post:
+      tags:
+      - Auth
+      summary: Refresh JWT token
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        default:
+          $ref: '#/components/responses/GeneralError'
+  /auth/register:
+    post:
+      tags:
+      - Auth
+      summary: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+        default:
+          $ref: '#/components/responses/GeneralError'
+  /folders:
+    get:
+      tags:
+      - Folders
+      summary: List folders
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: List of folders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Folder'
+    post:
+      tags:
+      - Folders
+      summary: Create a folder
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFolderRequest'
+      responses:
+        '201':
+          description: Folder created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+  /folders/{folderId}:
+    patch:
+      tags:
+      - Folders
+      summary: Update a folder
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: folderId
+        in: path
+        required: true
+        description: ID of the folder to update
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFolderRequest'
+      responses:
+        '200':
+          description: Folder updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Folder'
+    delete:
+      tags:
+      - Folders
+      summary: Delete a folder
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: folderId
+        in: path
+        required: true
+        description: ID of the folder to delete
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Folder deleted successfully
+  /folders/items/move:
+    post:
+      tags:
+      - Folders
+      summary: Move items to a target folder
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveItemsRequest'
+      responses:
+        '204':
+          description: Items moved successfully
+  /links:
+    get:
+      tags:
+      - Links
+      summary: List Links
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: folderId
+        in: query
+        description: Filter Links by folder
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: Number of items to skip before starting to collect the result set
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - name: limit
+        in: query
+        description: Maximum number of items to return
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Paginated list of Links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLinks'
+    post:
+      tags:
+      - Links
+      summary: Create a new Link
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLinkRequest'
+      responses:
+        '201':
+          description: Link saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+  /links/{linkId}:
+    delete:
+      tags:
+      - Links
+      summary: Delete Link
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: linkId
+        in: path
+        required: true
+        description: ID of the Link to delete
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Link deleted successfully
+          content: {}
+    patch:
+      tags:
+      - Links
+      summary: Update Link
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: linkId
+        in: path
+        required: true
+        description: ID of the Link to update
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLinkRequest'
+      responses:
+        '200':
+          description: Link updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+  /links/parse:
+    post:
+      tags:
+      - Links
+      summary: Parse Link HTML
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParseHtmlRequest'
+      responses:
+        '200':
+          description: Link parsed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParsedHtml'
+  /ping:
+    get:
+      tags:
+      - Ping
+      summary: Ping the server
+      description: Check if the server is running
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Server is running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: pong
+        default:
+          $ref: '#/components/responses/GeneralError'
+  /tags:
+    get:
+      tags:
+      - Tags
+      summary: List tags
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+  /users/me:
+    get:
+      tags:
+      - Users
+      summary: Get current user
+      description: Retrieve the currently authenticated user's profile
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/GeneralError'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AuthToken:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    CreateFolderRequest:
+      type: object
+      required:
+      - name
+      - parentId
+      properties:
+        name:
+          type: string
+        parentId:
+          type: string
+          description: Parent folder ID
+    CreateLinkRequest:
+      type: object
+      required:
+      - folderId
+      - url
+      properties:
+        url:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        folderId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    Folder:
+      type: object
+      required:
+      - id
+      - name
+      - userId
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        parentId:
+          type: string
+        userId:
+          type: string
+    FolderItem:
+      type: object
+      required:
+      - id
+      - type
+      properties:
+        id:
+          type: string
+          description: ID of the item to move
+        type:
+          type: string
+          enum:
+          - folder
+          - link
+          description: Type of the item
+    GeneralError:
+      type: object
+      required:
+      - message
+      properties:
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: string
+          description: Validation errors for specific fields
+        message:
+          type: string
+          description: A description of the error
+    Link:
+      type: object
+      required:
+      - id
+      - url
+      - folderId
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        name:
+          type: string
+        description:
+          type: string
+        isFavorite:
+          type: boolean
+        tags:
+          type: array
+          items:
+            type: string
+        folderId:
+          type: string
+    LoginRequest:
+      type: object
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+    MoveItemsRequest:
+      type: object
+      required:
+      - targetFolderId
+      - items
+      properties:
+        targetFolderId:
+          type: string
+          description: ID of the target folder to move items to
+        items:
+          type: array
+          description: List of items to move
+          items:
+            $ref: '#/components/schemas/FolderItem'
+    PaginatedLinks:
+      type: object
+      required:
+      - items
+      - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        limit:
+          type: integer
+          description: Limit of items per page
+        offset:
+          type: integer
+          description: Offset of the current page
+        total:
+          type: integer
+          description: Total number of links matching the query
+    ParsedHtml:
+      type: object
+      required:
+      - url
+      properties:
+        title:
+          type: string
+    ParseHtmlRequest:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          format: uri
+    RegisterRequest:
+      type: object
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    UpdateLinkRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        folderId:
+          type: string
+        isFavorite:
+          type: boolean
+        name:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        url:
+          type: string
+          format: uri
+    User:
+      type: object
+      required:
+      - id
+      - email
+      - folderId
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        folderId:
+          type: string
+    UpdateFolderRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        parentId:
+          type: string
+  responses:
+    GeneralError:
+      description: A general error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GeneralError'
