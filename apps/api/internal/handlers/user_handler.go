@@ -38,8 +38,7 @@ func (h *UserHandler) GetUsersMe(
 	return c.JSON(
 		http.StatusOK,
 		api.User{
-			Email:    user.Email,
-			FolderId: *user.FolderId,
-			Id:       user.ID,
+			Email: user.Email,
+			Id:    user.ID,
 		})
 }

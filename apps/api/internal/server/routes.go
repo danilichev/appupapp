@@ -63,6 +63,7 @@ func (s *Server) registerMiddleware(e *echo.Echo) {
 				"/api/v1/auth/login",
 				"/api/v1/auth/refresh",
 				"/api/v1/auth/register",
+				"/api/v1/ping",
 				"/docs",
 			}
 			return slices.Contains(notRestrictedPathes, c.Path())
@@ -96,38 +97,21 @@ func (s *Server) registerRoutes(e *echo.Echo) {
 
 	db := s.db.GetDB()
 
-	folderRepo := repositories.NewFolderRepo(db)
-	linkRepo := repositories.NewLinkRepo(db)
 	userRepo := repositories.NewUserRepo(db)
 
 	jwtService := services.NewJWTService(s.config.Jwt)
-	parseHtmlService := services.NewParseHtmlService()
 
 	authHandler := handlers.NewAuthHandler(userRepo, jwtService)
-	folderHandler := handlers.NewFolderHandler(folderRepo)
-	linkHandler := handlers.NewLinkHandler(
-		linkRepo,
-		folderRepo,
-		userRepo,
-		parseHtmlService,
-	)
 	pingHandler := handlers.NewPingHandler()
-	tagHandler := handlers.NewTagHandler()
 	userHandler := handlers.NewUserHandler(userRepo)
 
 	combinedHandler := struct {
 		*handlers.AuthHandler
-		*handlers.FolderHandler
-		*handlers.LinkHandler
 		*handlers.PingHandler
-		*handlers.TagHandler
 		*handlers.UserHandler
 	}{
 		authHandler,
-		folderHandler,
-		linkHandler,
 		pingHandler,
-		tagHandler,
 		userHandler,
 	}
 

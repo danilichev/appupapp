@@ -4,21 +4,11 @@
 package api
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/labstack/echo/v4"
-	"github.com/oapi-codegen/runtime"
 )
 
 const (
 	BearerAuthScopes = "BearerAuth.Scopes"
-)
-
-// Defines values for FolderItemType.
-const (
-	FolderItemTypeFolder FolderItemType = "folder"
-	FolderItemTypeLink   FolderItemType = "link"
 )
 
 // AuthToken defines model for AuthToken.
@@ -26,43 +16,6 @@ type AuthToken struct {
 	AccessToken  *string `json:"accessToken,omitempty"`
 	RefreshToken *string `json:"refreshToken,omitempty"`
 }
-
-// CreateFolderRequest defines model for CreateFolderRequest.
-type CreateFolderRequest struct {
-	Name string `json:"name"`
-
-	// ParentId Parent folder ID
-	ParentId string `json:"parentId"`
-}
-
-// CreateLinkRequest defines model for CreateLinkRequest.
-type CreateLinkRequest struct {
-	Description *string   `json:"description,omitempty"`
-	FolderId    string    `json:"folderId"`
-	Name        *string   `json:"name,omitempty"`
-	Tags        *[]string `json:"tags,omitempty"`
-	Url         string    `json:"url"`
-}
-
-// Folder defines model for Folder.
-type Folder struct {
-	Id       string  `json:"id"`
-	Name     string  `json:"name"`
-	ParentId *string `json:"parentId,omitempty"`
-	UserId   string  `json:"userId"`
-}
-
-// FolderItem defines model for FolderItem.
-type FolderItem struct {
-	// Id ID of the item to move
-	Id string `json:"id"`
-
-	// Type Type of the item
-	Type FolderItemType `json:"type"`
-}
-
-// FolderItemType Type of the item
-type FolderItemType string
 
 // GeneralError defines model for GeneralError.
 type GeneralError struct {
@@ -73,54 +26,10 @@ type GeneralError struct {
 	Message string `json:"message"`
 }
 
-// Link defines model for Link.
-type Link struct {
-	Description *string   `json:"description,omitempty"`
-	FolderId    string    `json:"folderId"`
-	Id          string    `json:"id"`
-	IsFavorite  *bool     `json:"isFavorite,omitempty"`
-	Name        *string   `json:"name,omitempty"`
-	Tags        *[]string `json:"tags,omitempty"`
-	Url         string    `json:"url"`
-}
-
 // LoginRequest defines model for LoginRequest.
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
-
-// MoveItemsRequest defines model for MoveItemsRequest.
-type MoveItemsRequest struct {
-	// Items List of items to move
-	Items []FolderItem `json:"items"`
-
-	// TargetFolderId ID of the target folder to move items to
-	TargetFolderId string `json:"targetFolderId"`
-}
-
-// PaginatedLinks defines model for PaginatedLinks.
-type PaginatedLinks struct {
-	Items []Link `json:"items"`
-
-	// Limit Limit of items per page
-	Limit *int `json:"limit,omitempty"`
-
-	// Offset Offset of the current page
-	Offset *int `json:"offset,omitempty"`
-
-	// Total Total number of links matching the query
-	Total int `json:"total"`
-}
-
-// ParseHtmlRequest defines model for ParseHtmlRequest.
-type ParseHtmlRequest struct {
-	Url string `json:"url"`
-}
-
-// ParsedHtml defines model for ParsedHtml.
-type ParsedHtml struct {
-	Title *string `json:"title,omitempty"`
 }
 
 // RegisterRequest defines model for RegisterRequest.
@@ -129,45 +38,10 @@ type RegisterRequest struct {
 	Password string `json:"password"`
 }
 
-// Tag defines model for Tag.
-type Tag struct {
-	Id   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
-}
-
-// UpdateFolderRequest defines model for UpdateFolderRequest.
-type UpdateFolderRequest struct {
-	Name     *string `json:"name,omitempty"`
-	ParentId *string `json:"parentId,omitempty"`
-}
-
-// UpdateLinkRequest defines model for UpdateLinkRequest.
-type UpdateLinkRequest struct {
-	Description *string   `json:"description,omitempty"`
-	FolderId    *string   `json:"folderId,omitempty"`
-	IsFavorite  *bool     `json:"isFavorite,omitempty"`
-	Name        *string   `json:"name,omitempty"`
-	Tags        *[]string `json:"tags,omitempty"`
-	Url         *string   `json:"url,omitempty"`
-}
-
 // User defines model for User.
 type User struct {
-	Email    string `json:"email"`
-	FolderId string `json:"folderId"`
-	Id       string `json:"id"`
-}
-
-// GetLinksParams defines parameters for GetLinks.
-type GetLinksParams struct {
-	// FolderId Filter Links by folder
-	FolderId *string `form:"folderId,omitempty" json:"folderId,omitempty"`
-
-	// Offset Number of items to skip before starting to collect the result set
-	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
-
-	// Limit Maximum number of items to return
-	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+	Email string `json:"email"`
+	Id    string `json:"id"`
 }
 
 // PostAuthLoginJSONRequestBody defines body for PostAuthLogin for application/json ContentType.
@@ -175,24 +49,6 @@ type PostAuthLoginJSONRequestBody = LoginRequest
 
 // PostAuthRegisterJSONRequestBody defines body for PostAuthRegister for application/json ContentType.
 type PostAuthRegisterJSONRequestBody = RegisterRequest
-
-// PostFoldersJSONRequestBody defines body for PostFolders for application/json ContentType.
-type PostFoldersJSONRequestBody = CreateFolderRequest
-
-// PostFoldersItemsMoveJSONRequestBody defines body for PostFoldersItemsMove for application/json ContentType.
-type PostFoldersItemsMoveJSONRequestBody = MoveItemsRequest
-
-// PatchFoldersFolderIdJSONRequestBody defines body for PatchFoldersFolderId for application/json ContentType.
-type PatchFoldersFolderIdJSONRequestBody = UpdateFolderRequest
-
-// PostLinksJSONRequestBody defines body for PostLinks for application/json ContentType.
-type PostLinksJSONRequestBody = CreateLinkRequest
-
-// PostLinksParseJSONRequestBody defines body for PostLinksParse for application/json ContentType.
-type PostLinksParseJSONRequestBody = ParseHtmlRequest
-
-// PatchLinksLinkIdJSONRequestBody defines body for PatchLinksLinkId for application/json ContentType.
-type PatchLinksLinkIdJSONRequestBody = UpdateLinkRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -205,42 +61,9 @@ type ServerInterface interface {
 	// Register a new user
 	// (POST /auth/register)
 	PostAuthRegister(ctx echo.Context) error
-	// List folders
-	// (GET /folders)
-	GetFolders(ctx echo.Context) error
-	// Create a folder
-	// (POST /folders)
-	PostFolders(ctx echo.Context) error
-	// Move items to a target folder
-	// (POST /folders/items/move)
-	PostFoldersItemsMove(ctx echo.Context) error
-	// Delete a folder
-	// (DELETE /folders/{folderId})
-	DeleteFoldersFolderId(ctx echo.Context, folderId string) error
-	// Update a folder
-	// (PATCH /folders/{folderId})
-	PatchFoldersFolderId(ctx echo.Context, folderId string) error
-	// List Links
-	// (GET /links)
-	GetLinks(ctx echo.Context, params GetLinksParams) error
-	// Create a new Link
-	// (POST /links)
-	PostLinks(ctx echo.Context) error
-	// Parse Link HTML
-	// (POST /links/parse)
-	PostLinksParse(ctx echo.Context) error
-	// Delete Link
-	// (DELETE /links/{linkId})
-	DeleteLinksLinkId(ctx echo.Context, linkId string) error
-	// Update Link
-	// (PATCH /links/{linkId})
-	PatchLinksLinkId(ctx echo.Context, linkId string) error
 	// Ping the server
 	// (GET /ping)
 	GetPing(ctx echo.Context) error
-	// List tags
-	// (GET /tags)
-	GetTags(ctx echo.Context) error
 	// Get current user
 	// (GET /users/me)
 	GetUsersMe(ctx echo.Context) error
@@ -280,167 +103,6 @@ func (w *ServerInterfaceWrapper) PostAuthRegister(ctx echo.Context) error {
 	return err
 }
 
-// GetFolders converts echo context to params.
-func (w *ServerInterfaceWrapper) GetFolders(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetFolders(ctx)
-	return err
-}
-
-// PostFolders converts echo context to params.
-func (w *ServerInterfaceWrapper) PostFolders(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PostFolders(ctx)
-	return err
-}
-
-// PostFoldersItemsMove converts echo context to params.
-func (w *ServerInterfaceWrapper) PostFoldersItemsMove(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PostFoldersItemsMove(ctx)
-	return err
-}
-
-// DeleteFoldersFolderId converts echo context to params.
-func (w *ServerInterfaceWrapper) DeleteFoldersFolderId(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "folderId" -------------
-	var folderId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "folderId", ctx.Param("folderId"), &folderId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter folderId: %s", err))
-	}
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.DeleteFoldersFolderId(ctx, folderId)
-	return err
-}
-
-// PatchFoldersFolderId converts echo context to params.
-func (w *ServerInterfaceWrapper) PatchFoldersFolderId(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "folderId" -------------
-	var folderId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "folderId", ctx.Param("folderId"), &folderId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter folderId: %s", err))
-	}
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PatchFoldersFolderId(ctx, folderId)
-	return err
-}
-
-// GetLinks converts echo context to params.
-func (w *ServerInterfaceWrapper) GetLinks(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetLinksParams
-	// ------------- Optional query parameter "folderId" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "folderId", ctx.QueryParams(), &params.FolderId)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter folderId: %s", err))
-	}
-
-	// ------------- Optional query parameter "offset" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
-	}
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetLinks(ctx, params)
-	return err
-}
-
-// PostLinks converts echo context to params.
-func (w *ServerInterfaceWrapper) PostLinks(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PostLinks(ctx)
-	return err
-}
-
-// PostLinksParse converts echo context to params.
-func (w *ServerInterfaceWrapper) PostLinksParse(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PostLinksParse(ctx)
-	return err
-}
-
-// DeleteLinksLinkId converts echo context to params.
-func (w *ServerInterfaceWrapper) DeleteLinksLinkId(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "linkId" -------------
-	var linkId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "linkId", ctx.Param("linkId"), &linkId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter linkId: %s", err))
-	}
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.DeleteLinksLinkId(ctx, linkId)
-	return err
-}
-
-// PatchLinksLinkId converts echo context to params.
-func (w *ServerInterfaceWrapper) PatchLinksLinkId(ctx echo.Context) error {
-	var err error
-	// ------------- Path parameter "linkId" -------------
-	var linkId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "linkId", ctx.Param("linkId"), &linkId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter linkId: %s", err))
-	}
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.PatchLinksLinkId(ctx, linkId)
-	return err
-}
-
 // GetPing converts echo context to params.
 func (w *ServerInterfaceWrapper) GetPing(ctx echo.Context) error {
 	var err error
@@ -449,17 +111,6 @@ func (w *ServerInterfaceWrapper) GetPing(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.GetPing(ctx)
-	return err
-}
-
-// GetTags converts echo context to params.
-func (w *ServerInterfaceWrapper) GetTags(ctx echo.Context) error {
-	var err error
-
-	ctx.Set(BearerAuthScopes, []string{})
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetTags(ctx)
 	return err
 }
 
@@ -505,18 +156,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/auth/login", wrapper.PostAuthLogin)
 	router.POST(baseURL+"/auth/refresh", wrapper.PostAuthRefresh)
 	router.POST(baseURL+"/auth/register", wrapper.PostAuthRegister)
-	router.GET(baseURL+"/folders", wrapper.GetFolders)
-	router.POST(baseURL+"/folders", wrapper.PostFolders)
-	router.POST(baseURL+"/folders/items/move", wrapper.PostFoldersItemsMove)
-	router.DELETE(baseURL+"/folders/:folderId", wrapper.DeleteFoldersFolderId)
-	router.PATCH(baseURL+"/folders/:folderId", wrapper.PatchFoldersFolderId)
-	router.GET(baseURL+"/links", wrapper.GetLinks)
-	router.POST(baseURL+"/links", wrapper.PostLinks)
-	router.POST(baseURL+"/links/parse", wrapper.PostLinksParse)
-	router.DELETE(baseURL+"/links/:linkId", wrapper.DeleteLinksLinkId)
-	router.PATCH(baseURL+"/links/:linkId", wrapper.PatchLinksLinkId)
 	router.GET(baseURL+"/ping", wrapper.GetPing)
-	router.GET(baseURL+"/tags", wrapper.GetTags)
 	router.GET(baseURL+"/users/me", wrapper.GetUsersMe)
 
 }

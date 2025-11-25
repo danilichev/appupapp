@@ -36,18 +36,8 @@ func TestUserRepo_CreateUser(t *testing.T) {
 		assert.NotEmpty(t, user.ID)
 		assert.Equal(t, userCreate.Email, user.Email)
 		assert.Equal(t, userCreate.PasswordHash, user.PasswordHash)
-		assert.NotNil(t, user.FolderId)
-		assert.NotEmpty(t, *user.FolderId)
 		assert.False(t, user.CreatedAt.IsZero())
 		assert.False(t, user.UpdatedAt.IsZero())
-
-		// Verify that the root folder was created
-		db := testDbService.GetDB()
-		var folderName string
-		err = db.QueryRow(ctx, "SELECT name FROM folders WHERE id = $1", *user.FolderId).
-			Scan(&folderName)
-		require.NoError(t, err)
-		assert.Equal(t, "root", folderName)
 	})
 
 	t.Run(
@@ -69,45 +59,6 @@ func TestUserRepo_CreateUser(t *testing.T) {
 			_, err = userRepo.CreateUser(ctx, userCreate)
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), "Failed to create user")
-		},
-	)
-
-	t.Run(
-		"should rollback transaction on folder creation failure",
-		func(t *testing.T) {
-			cleanupTestDatabase()
-			userRepo := getTestUserRepo()
-
-			// Drop folders table to simulate failure
-			db := testDbService.GetDB()
-			_, err := db.Exec(ctx, "DROP TABLE IF EXISTS folders CASCADE")
-			require.NoError(t, err)
-
-			userCreate := models.UserCreate{
-				Email:        "rollback@example.com",
-				PasswordHash: "hashedpassword123",
-			}
-
-			_, err = userRepo.CreateUser(ctx, userCreate)
-			assert.Error(t, err)
-
-			// Verify user was not created
-			var count int
-			err = db.QueryRow(ctx, "SELECT COUNT(*) FROM users WHERE email = $1", userCreate.Email).
-				Scan(&count)
-			require.NoError(t, err)
-			assert.Equal(t, 0, count)
-
-			// Recreate folders table for other tests
-			_, err = db.Exec(ctx, `CREATE TABLE IF NOT EXISTS folders (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-			name TEXT NOT NULL,
-			parent_id UUID REFERENCES folders(id) ON DELETE CASCADE,
-			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-			updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-		)`)
-			require.NoError(t, err)
 		},
 	)
 }
@@ -136,7 +87,6 @@ func TestUserRepo_GetUserByEmail(t *testing.T) {
 		assert.Equal(t, createdUser.ID, user.ID)
 		assert.Equal(t, createdUser.Email, user.Email)
 		assert.Equal(t, createdUser.PasswordHash, user.PasswordHash)
-		assert.Equal(t, createdUser.FolderId, user.FolderId)
 	})
 
 	t.Run("should return error when user not found", func(t *testing.T) {
@@ -195,7 +145,6 @@ func TestUserRepo_GetUserById(t *testing.T) {
 		assert.Equal(t, createdUser.ID, user.ID)
 		assert.Equal(t, createdUser.Email, user.Email)
 		assert.Equal(t, createdUser.PasswordHash, user.PasswordHash)
-		assert.Equal(t, createdUser.FolderId, user.FolderId)
 	})
 
 	t.Run("should return error when user not found", func(t *testing.T) {
@@ -318,18 +267,6 @@ func TestUserRepo_Integration_CompleteFlow(t *testing.T) {
 			retrievedUser, err := userRepo.GetUserById(ctx, user.ID)
 			require.NoError(t, err)
 			assert.Equal(t, user.Email, retrievedUser.Email)
-		}
-
-		// Verify each user has a unique root folder
-		folderIds := make(map[string]bool)
-		for _, user := range createdUsers {
-			assert.NotNil(t, user.FolderId)
-			assert.False(
-				t,
-				folderIds[*user.FolderId],
-				"Folder ID should be unique",
-			)
-			folderIds[*user.FolderId] = true
 		}
 
 		// Verify total user count in database
@@ -463,34 +400,6 @@ func TestUserRepo_EdgeCases(t *testing.T) {
 			assert.NoError(t, retrieveErr)
 			assert.Equal(t, user.ID, retrievedUser.ID)
 		}
-	})
-
-	t.Run("should verify folder relationship integrity", func(t *testing.T) {
-		cleanupTestDatabase()
-		userRepo := getTestUserRepo()
-
-		userCreate := models.UserCreate{
-			Email:        "folder-integrity@example.com",
-			PasswordHash: "hashedpassword123",
-		}
-
-		user, err := userRepo.CreateUser(ctx, userCreate)
-		require.NoError(t, err)
-		require.NotNil(t, user.FolderId)
-
-		// Verify the folder exists and has correct properties
-		db := testDbService.GetDB()
-		var folderUserId, folderName string
-		var parentId *string
-		err = db.QueryRow(ctx,
-			"SELECT user_id, name, parent_id FROM folders WHERE id = $1",
-			*user.FolderId,
-		).Scan(&folderUserId, &folderName, &parentId)
-
-		require.NoError(t, err)
-		assert.Equal(t, user.ID, folderUserId)
-		assert.Equal(t, "root", folderName)
-		assert.Nil(t, parentId) // Root folder should have no parent
 	})
 
 	t.Run("should handle context cancellation gracefully", func(t *testing.T) {

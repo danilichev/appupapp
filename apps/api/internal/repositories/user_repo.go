@@ -26,56 +26,18 @@ func (r *UserRepo) CreateUser(
 	ctx context.Context,
 	userCreate models.UserCreate,
 ) (*models.User, error) {
-	tx, err := r.db.Begin(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to begin transaction: %w", err)
-	}
-
-	defer func() {
-		if err != nil {
-			tx.Rollback(ctx)
-		} else {
-			tx.Commit(ctx)
-		}
-	}()
-
-	var userId string
 	ib := sqlbuilder.PostgreSQL.NewInsertBuilder()
 	ib.InsertInto("users")
 	ib.Cols("email", "password_hash")
 	ib.Values(userCreate.Email, userCreate.PasswordHash)
-	ib.Returning("id")
+	ib.Returning(strings.Join(userStruct.Columns(), ","))
 	sql, args := ib.Build()
-	err = tx.QueryRow(ctx, sql, args...).Scan(&userId)
+
+	var user models.User
+	err := r.db.QueryRow(ctx, sql, args...).Scan(userStruct.Addr(&user)...)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create user: %w", err)
 	}
-
-	var folderId string
-	ib = sqlbuilder.PostgreSQL.NewInsertBuilder()
-	ib.InsertInto("folders")
-	ib.Cols("user_id", "name")
-	ib.Values(userId, "root")
-	ib.Returning("id")
-	sql, args = ib.Build()
-	err = tx.QueryRow(ctx, sql, args...).Scan(&folderId)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create root folder: %w", err)
-	}
-
-	ub := userStruct.WithoutTag("pk").Update("users", models.User{})
-	ub.Set(ub.Assign("folder_id", folderId))
-	ub.Where(ub.Equal("id", userId))
-	ub.SQL("RETURNING " + strings.Join(userStruct.Columns(), ","))
-	sql, args = ub.Build()
-
-	var user models.User
-	userRow := tx.QueryRow(ctx, sql, args...)
-	err = userRow.Scan(userStruct.Addr(&user)...)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to update user with folder_id: %w", err)
-	}
-
 	return &user, nil
 }
 

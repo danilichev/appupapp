@@ -10,13 +10,10 @@ import (
 
 	"apps/api/internal/config"
 	"apps/api/internal/database"
-	"apps/api/internal/models"
 
 	"github.com/golang-migrate/migrate/v4"
 	migratepg "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	tcpostgres "github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -114,7 +111,7 @@ func cleanupTestDatabase() {
 	db := testDbService.GetDB()
 	_, _ = db.Exec(
 		context.Background(),
-		"TRUNCATE TABLE users, folders CASCADE",
+		"TRUNCATE TABLE users CASCADE",
 	)
 }
 
@@ -137,104 +134,4 @@ func TestMain(m *testing.M) {
 	}
 
 	log.Printf("Tests completed with exit code %d", code)
-}
-
-func createTestUSer(t *testing.T, ctx context.Context) *models.User {
-	userRepo := getTestUserRepo()
-
-	userCreate := models.UserCreate{
-		Email:        "test@example.com",
-		PasswordHash: "hashedpassword123",
-	}
-
-	user, err := userRepo.CreateUser(ctx, userCreate)
-
-	require.NoError(t, err)
-	require.NotNil(t, user)
-
-	assert.NotEmpty(t, user.ID)
-
-	return user
-}
-
-func createTestFolder(
-	t *testing.T,
-	ctx context.Context,
-	userId string,
-) *models.Folder {
-	folderRepo := getTestFolderRepo()
-
-	folderCreate := models.FolderCreate{
-		Name:     "Test Folder",
-		ParentId: nil,
-		UserId:   userId,
-	}
-
-	folder, err := folderRepo.CreateFolder(ctx, folderCreate)
-
-	require.NoError(t, err)
-	require.NotNil(t, folder)
-
-	assert.NotEmpty(t, folder.ID)
-	assert.Equal(t, folderCreate.UserId, userId)
-
-	return folder
-}
-
-func createTestLink(
-	t *testing.T,
-	ctx context.Context,
-	userId, folderId string,
-) *models.Link {
-	linkRepo := getTestLinkRepo()
-
-	linkCreate := models.LinkCreate{
-		Url:         "https://example.com",
-		Name:        "Example Link",
-		Description: "A test link for example.com",
-		UserId:      userId,
-		FolderId:    folderId,
-	}
-
-	link, err := linkRepo.CreateLink(ctx, linkCreate)
-	require.NoError(t, err)
-	require.NotNil(t, link)
-
-	assert.NotEmpty(t, link.ID)
-	assert.Equal(t, linkCreate.UserId, userId)
-	assert.Equal(t, linkCreate.FolderId, folderId)
-
-	return link
-}
-
-func assertLinkFolder(
-	t *testing.T,
-	ctx context.Context,
-	linkId, expectedFolderId string,
-) {
-	linkRepo := getTestLinkRepo()
-
-	link, err := linkRepo.GetLinkById(ctx, linkId)
-	require.NoError(t, err)
-	require.NotNil(t, link)
-
-	assert.Equal(t, expectedFolderId, link.FolderId)
-}
-
-func assertFolderParent(
-	t *testing.T,
-	ctx context.Context,
-	folderId, expectedParentId string,
-) {
-	folderRepo := getTestFolderRepo()
-
-	folder, err := folderRepo.GetFolderById(ctx, folderId)
-	require.NoError(t, err)
-	require.NotNil(t, folder)
-
-	if folder.ParentId != nil {
-		assert.Equal(t, expectedParentId, *folder.ParentId)
-	} else {
-		assert.Fail(t, "ParentId is nil")
-	}
 }
