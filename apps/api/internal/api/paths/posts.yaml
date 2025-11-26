@@ -1,4 +1,4 @@
-Posts:
+posts:
   get:
     tags:
     - Posts
@@ -39,7 +39,7 @@ Posts:
       content:
         application/json:
           schema:
-            $ref: '../schemas/CreateLinkRequest.yaml'
+            $ref: '../schemas/CreatePostRequest.yaml'
     responses:
       '201':
         description: Post saved successfully
@@ -87,7 +87,7 @@ postsPostId:
       content:
         application/json:
           schema:
-            $ref: '../schemas/UpdateLinkRequest.yaml'
+            $ref: '../schemas/UpdatePostRequest.yaml'
     responses:
       '200':
         description: Post updated successfully

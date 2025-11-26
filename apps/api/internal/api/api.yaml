@@ -17,6 +17,8 @@ paths:
   /auth/refresh: { $ref: './paths/auth.yaml#/authRefresh' }
   /auth/register: { $ref: './paths/auth.yaml#/authRegister' }
   /ping: { $ref: './paths/ping.yaml#/ping' }
+  /posts: { $ref: './paths/posts.yaml#/posts' }
+  /posts/{postId}: { $ref: './paths/posts.yaml#/postsPostId' }
   /users/me: { $ref: './paths/users.yaml#/usersMe' }
 
 components:
@@ -24,9 +26,12 @@ components:
     BearerAuth: { $ref: './securitySchemes/BearerAuth.yaml' }
   schemas:
     AuthToken: { $ref: './schemas/AuthToken.yaml' }
+    CreatePostRequest: { $ref: './schemas/CreatePostRequest.yaml' }
     GeneralError: { $ref: './schemas/GeneralError.yaml' }
     LoginRequest: { $ref: './schemas/LoginRequest.yaml' }
+    PaginatedPosts: { $ref: './schemas/PaginatedPosts.yaml' }
     RegisterRequest: { $ref: './schemas/RegisterRequest.yaml' }
+    UpdatePostRequest: { $ref: './schemas/UpdatePostRequest.yaml' }
     User: { $ref: './schemas/User.yaml' }
   responses:
     GeneralError:

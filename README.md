@@ -32,8 +32,6 @@ Generate Go code after updating api.yaml or related schemas:
 npx nx gen apps/api
 ```
 
-<!-- TODO: describe typical flow from genereting openapi schemas to write handlers -->
-
 ## Add new projects
 
 While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
@@ -79,3 +77,13 @@ And join the Nx community:
 - [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
 - [Our Youtube channel](https://www.youtube.com/@nxdevtools)
 - [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+
+## Development Flows
+
+## Add new api endpoint:
+
+0. Look at `apps/api/internal/api/api.yaml` this is the entry point of the spec
+1. Modify schemas/responses/paths in `apps/api/internal/api/` and update `/api.yaml` if needed
+2. Run `npx nx gen apps/api`, this generates full openapi doc and Go code
+3. Update `apps/api/internal/server/routes.go` based on generation result
+4. Update `apps/api/internal/handlres`
