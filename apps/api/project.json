@@ -1,0 +1,36 @@
+{
+  "name": "apps/api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/api",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx-go/nx-go:build",
+      "options": {
+        "main": "{projectRoot}/cmd/api/main.go"
+      }
+    },
+    "docker:down": {
+      "command": "cd {projectRoot} && make docker-down"
+    },
+    "docker:up": {
+      "command": "cd {projectRoot} && make docker-up"
+    },
+    "gen": {
+      "command": "cd {projectRoot}/internal/api && redocly bundle api.yaml --output openapi.yaml && go generate"
+    },
+    "lint": {
+      "executor": "@nx-go/nx-go:lint"
+    },
+    "serve": {
+      "command": "cd {projectRoot} && make watch"
+    },
+    "test": {
+      "executor": "@nx-go/nx-go:test"
+    },
+    "tidy": {
+      "executor": "@nx-go/nx-go:tidy"
+    }
+  }
+}

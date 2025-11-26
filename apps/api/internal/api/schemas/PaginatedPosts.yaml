@@ -1,0 +1,18 @@
+type: object
+required:
+- items
+- total
+properties:
+  items:
+    type: array
+    items:
+      $ref: './Post.yaml'
+  limit:
+    type: integer
+    description: Limit of items per page
+  offset:
+    type: integer
+    description: Offset of the current page
+  total:
+    type: integer
+    description: Total number of posts matching the query

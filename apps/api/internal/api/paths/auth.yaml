@@ -1,0 +1,60 @@
+authLogin:
+  post:
+    tags:
+    - Auth
+    summary: Log in user
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/LoginRequest.yaml'
+    responses:
+      '200':
+        description: Successfully logged in
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/AuthToken.yaml'
+      default:
+        $ref: '../responses/GeneralError.yaml'
+
+authRefresh:
+  post:
+    tags:
+    - Auth
+    summary: Refresh JWT token
+    security:
+    - BearerAuth: []
+    responses:
+      '200':
+        description: Token refreshed successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/AuthToken.yaml'
+      default:
+        $ref: '../responses/GeneralError.yaml'
+
+authRegister:
+  post:
+    tags:
+    - Auth
+    summary: Register a new user
+    security: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/RegisterRequest.yaml'
+    responses:
+      '201':
+        description: User registered successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/AuthToken.yaml'
+      default:
+        $ref: '../responses/GeneralError.yaml'

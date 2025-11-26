@@ -1,0 +1,17 @@
+usersMe:
+  get:
+    tags:
+    - Users
+    summary: Get current user
+    description: Retrieve the currently authenticated user's profile
+    security:
+    - BearerAuth: []
+    responses:
+      '200':
+        description: Current user profile
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/User.yaml'
+      '401':
+        $ref: '../responses/GeneralError.yaml'

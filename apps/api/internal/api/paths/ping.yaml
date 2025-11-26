@@ -1,0 +1,21 @@
+ping:
+  get:
+    tags:
+    - Ping
+    summary: Ping the server
+    description: Check if the server is running
+    security:
+    - BearerAuth: []
+    responses:
+      '200':
+        description: Server is running
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "pong"
+      default:
+        $ref: '../responses/GeneralError.yaml'

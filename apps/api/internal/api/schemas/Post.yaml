@@ -1,0 +1,21 @@
+type: object
+required:
+- id
+- authorId
+- content
+- title
+properties:
+  id:
+    type: string
+  authorId:
+    type: string
+  content:
+    type: string
+  title:
+    type: string
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time

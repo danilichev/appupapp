@@ -1,0 +1,12 @@
+type: object
+required:
+- authorId
+- content
+- title
+properties:
+  authorId:
+    type: string
+  content:
+    type: string
+  title:
+    type: string
