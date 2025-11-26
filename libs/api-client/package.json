@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "main": "./index.js",
   "types": "./index.d.ts",
+  "scripts": {
+    "gen": "npm run gen:api && npm run lint:gen",
+    "gen:api": "openapi-typescript ../../apps/api/internal/api/openapi.yaml -o ./src/lib/api.d.ts",
+    "lint:gen": "eslint ./src/lib/api.d.ts --fix && prettier --write ./src/lib/api.d.ts"
+  },
   "exports": {
     ".": {
       "import": "./index.mjs",
