@@ -97,21 +97,24 @@ func (s *Server) registerRoutes(e *echo.Echo) {
 
 	db := s.db.GetDB()
 
+	postRepo := repositories.NewPostRepo(db)
 	userRepo := repositories.NewUserRepo(db)
 
 	jwtService := services.NewJWTService(s.config.Jwt)
 
 	authHandler := handlers.NewAuthHandler(userRepo, jwtService)
 	pingHandler := handlers.NewPingHandler()
+	postHandler := handlers.NewPostHandler(postRepo, userRepo)
 	userHandler := handlers.NewUserHandler(userRepo)
-
 	combinedHandler := struct {
 		*handlers.AuthHandler
 		*handlers.PingHandler
+		*handlers.PostHandler
 		*handlers.UserHandler
 	}{
 		authHandler,
 		pingHandler,
+		postHandler,
 		userHandler,
 	}
 

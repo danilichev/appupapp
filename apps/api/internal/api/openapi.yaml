@@ -90,6 +90,119 @@ paths:
                     example: pong
         default:
           $ref: '#/components/responses/GeneralError'
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: List Posts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: offset
+          in: query
+          description: Number of items to skip before starting to collect the result set
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          description: Maximum number of items to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Paginated list of Posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPosts'
+    post:
+      tags:
+        - Posts
+      summary: Create a new Post
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        '201':
+          description: Post saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /posts/{postId}:
+    get:
+      tags:
+        - Posts
+      summary: Get Post by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: ID of the Post to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Post retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    patch:
+      tags:
+        - Posts
+      summary: Update Post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: ID of the Post to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostRequest'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    delete:
+      tags:
+        - Posts
+      summary: Delete Post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: ID of the Post to delete
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Post deleted successfully
+          content: {}
   /users/me:
     get:
       tags:
@@ -121,6 +234,19 @@ components:
           type: string
         refreshToken:
           type: string
+    CreatePostRequest:
+      type: object
+      required:
+        - authorId
+        - content
+        - title
+      properties:
+        authorId:
+          type: string
+        content:
+          type: string
+        title:
+          type: string
     GeneralError:
       type: object
       required:
@@ -145,6 +271,25 @@ components:
         password:
           type: string
           format: password
+    PaginatedPosts:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        limit:
+          type: integer
+          description: Limit of items per page
+        offset:
+          type: integer
+          description: Offset of the current page
+        total:
+          type: integer
+          description: Total number of posts matching the query
     RegisterRequest:
       type: object
       required:
@@ -154,6 +299,13 @@ components:
         email:
           type: string
         password:
+          type: string
+    UpdatePostRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        title:
           type: string
     User:
       type: object
@@ -165,6 +317,28 @@ components:
           type: string
         email:
           type: string
+    Post:
+      type: object
+      required:
+        - id
+        - authorId
+        - content
+        - title
+      properties:
+        id:
+          type: string
+        authorId:
+          type: string
+        content:
+          type: string
+        title:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
   responses:
     GeneralError:
       description: A general error response

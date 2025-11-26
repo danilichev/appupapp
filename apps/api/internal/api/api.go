@@ -4,7 +4,12 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
+	"github.com/oapi-codegen/runtime"
 )
 
 const (
@@ -15,6 +20,13 @@ const (
 type AuthToken struct {
 	AccessToken  *string `json:"accessToken,omitempty"`
 	RefreshToken *string `json:"refreshToken,omitempty"`
+}
+
+// CreatePostRequest defines model for CreatePostRequest.
+type CreatePostRequest struct {
+	AuthorId string `json:"authorId"`
+	Content  string `json:"content"`
+	Title    string `json:"title"`
 }
 
 // GeneralError defines model for GeneralError.
@@ -32,10 +44,40 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+// PaginatedPosts defines model for PaginatedPosts.
+type PaginatedPosts struct {
+	Items []Post `json:"items"`
+
+	// Limit Limit of items per page
+	Limit *int `json:"limit,omitempty"`
+
+	// Offset Offset of the current page
+	Offset *int `json:"offset,omitempty"`
+
+	// Total Total number of posts matching the query
+	Total int `json:"total"`
+}
+
+// Post defines model for Post.
+type Post struct {
+	AuthorId  string     `json:"authorId"`
+	Content   string     `json:"content"`
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	Id        string     `json:"id"`
+	Title     string     `json:"title"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+}
+
 // RegisterRequest defines model for RegisterRequest.
 type RegisterRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+// UpdatePostRequest defines model for UpdatePostRequest.
+type UpdatePostRequest struct {
+	Content *string `json:"content,omitempty"`
+	Title   *string `json:"title,omitempty"`
 }
 
 // User defines model for User.
@@ -44,11 +86,26 @@ type User struct {
 	Id    string `json:"id"`
 }
 
+// GetPostsParams defines parameters for GetPosts.
+type GetPostsParams struct {
+	// Offset Number of items to skip before starting to collect the result set
+	Offset *int `form:"offset,omitempty" json:"offset,omitempty"`
+
+	// Limit Maximum number of items to return
+	Limit *int `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
 // PostAuthLoginJSONRequestBody defines body for PostAuthLogin for application/json ContentType.
 type PostAuthLoginJSONRequestBody = LoginRequest
 
 // PostAuthRegisterJSONRequestBody defines body for PostAuthRegister for application/json ContentType.
 type PostAuthRegisterJSONRequestBody = RegisterRequest
+
+// PostPostsJSONRequestBody defines body for PostPosts for application/json ContentType.
+type PostPostsJSONRequestBody = CreatePostRequest
+
+// PatchPostsPostIdJSONRequestBody defines body for PatchPostsPostId for application/json ContentType.
+type PatchPostsPostIdJSONRequestBody = UpdatePostRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -64,6 +121,21 @@ type ServerInterface interface {
 	// Ping the server
 	// (GET /ping)
 	GetPing(ctx echo.Context) error
+	// List Posts
+	// (GET /posts)
+	GetPosts(ctx echo.Context, params GetPostsParams) error
+	// Create a new Post
+	// (POST /posts)
+	PostPosts(ctx echo.Context) error
+	// Delete Post
+	// (DELETE /posts/{postId})
+	DeletePostsPostId(ctx echo.Context, postId string) error
+	// Get Post by ID
+	// (GET /posts/{postId})
+	GetPostsPostId(ctx echo.Context, postId string) error
+	// Update Post
+	// (PATCH /posts/{postId})
+	PatchPostsPostId(ctx echo.Context, postId string) error
 	// Get current user
 	// (GET /users/me)
 	GetUsersMe(ctx echo.Context) error
@@ -114,6 +186,98 @@ func (w *ServerInterfaceWrapper) GetPing(ctx echo.Context) error {
 	return err
 }
 
+// GetPosts converts echo context to params.
+func (w *ServerInterfaceWrapper) GetPosts(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetPostsParams
+	// ------------- Optional query parameter "offset" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetPosts(ctx, params)
+	return err
+}
+
+// PostPosts converts echo context to params.
+func (w *ServerInterfaceWrapper) PostPosts(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PostPosts(ctx)
+	return err
+}
+
+// DeletePostsPostId converts echo context to params.
+func (w *ServerInterfaceWrapper) DeletePostsPostId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "postId" -------------
+	var postId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "postId", ctx.Param("postId"), &postId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter postId: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeletePostsPostId(ctx, postId)
+	return err
+}
+
+// GetPostsPostId converts echo context to params.
+func (w *ServerInterfaceWrapper) GetPostsPostId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "postId" -------------
+	var postId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "postId", ctx.Param("postId"), &postId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter postId: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetPostsPostId(ctx, postId)
+	return err
+}
+
+// PatchPostsPostId converts echo context to params.
+func (w *ServerInterfaceWrapper) PatchPostsPostId(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "postId" -------------
+	var postId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "postId", ctx.Param("postId"), &postId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter postId: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.PatchPostsPostId(ctx, postId)
+	return err
+}
+
 // GetUsersMe converts echo context to params.
 func (w *ServerInterfaceWrapper) GetUsersMe(ctx echo.Context) error {
 	var err error
@@ -157,6 +321,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/auth/refresh", wrapper.PostAuthRefresh)
 	router.POST(baseURL+"/auth/register", wrapper.PostAuthRegister)
 	router.GET(baseURL+"/ping", wrapper.GetPing)
+	router.GET(baseURL+"/posts", wrapper.GetPosts)
+	router.POST(baseURL+"/posts", wrapper.PostPosts)
+	router.DELETE(baseURL+"/posts/:postId", wrapper.DeletePostsPostId)
+	router.GET(baseURL+"/posts/:postId", wrapper.GetPostsPostId)
+	router.PATCH(baseURL+"/posts/:postId", wrapper.PatchPostsPostId)
 	router.GET(baseURL+"/users/me", wrapper.GetUsersMe)
 
 }
