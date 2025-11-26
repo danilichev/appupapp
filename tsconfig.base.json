@@ -16,8 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@appupapp/api-client": ["libs/api-client/src/index.ts"],
-      "@appupapp/mobile-ui": ["libs/mobile-ui/src/index.ts"],
-      "@appupapp/mobile-ui-restyle": ["libs/mobile-ui-restyle/src/index.ts"]
+      "@appupapp/mobile-ui": ["libs/mobile-ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
