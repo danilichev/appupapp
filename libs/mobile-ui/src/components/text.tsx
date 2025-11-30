@@ -10,10 +10,17 @@ import { Theme } from "../theme";
 type TextProps = RNTextProps & {
   size?: keyof Theme["components"]["text"]["text"]["variants"]["size"];
   variant?: keyof Theme["components"]["text"]["text"]["variants"]["variant"];
+  weight?: keyof Theme["components"]["text"]["text"]["variants"]["weight"];
 };
 
-export const Text = ({ size, style, variant, ...rest }: TextProps) => {
-  styles.useVariants({ size, variant });
+export const Text = ({
+  size = "md",
+  style,
+  variant = "p",
+  weight = "regular",
+  ...rest
+}: TextProps) => {
+  styles.useVariants({ size, variant, weight });
 
   return <RNText {...rest} style={[styles.text as TextStyle, style]} />;
 };

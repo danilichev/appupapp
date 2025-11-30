@@ -1,0 +1,88 @@
+export const colors = {
+  accent: "#e0e7ff",
+  accentForeground: "#374151",
+  background: "#f8fafc",
+  border: "#d1d5db",
+  card: "#ffffff",
+  cardForeground: "#1e293b",
+  destructive: "#ef4444",
+  destructiveForeground: "#ffffff",
+  foreground: "#1e293b",
+  input: "#d1d5db",
+  muted: "#f3f4f6",
+  mutedForeground: "#6b7280",
+  popover: "#ffffff",
+  popoverForeground: "#1e293b",
+  primary: "#6366f1",
+  primaryForeground: "#ffffff",
+  secondary: "#e5e7eb",
+  secondaryForeground: "#374151",
+};
+
+export type Colors = typeof colors;
+
+export const darkColors: Colors = {
+  accent: "#374151",
+  accentForeground: "#d1d5db",
+  background: "#0f172a",
+  border: "#4b5563",
+  card: "#1e293b",
+  cardForeground: "#e2e8f0",
+  destructive: "#ef4444",
+  destructiveForeground: "#0f172a",
+  foreground: "#e2e8f0",
+  input: "#4b5563",
+  muted: "#152032",
+  mutedForeground: "#9ca3af",
+  popover: "#1e293b",
+  popoverForeground: "#e2e8f0",
+  primary: "#818cf8",
+  primaryForeground: "#0f172a",
+  secondary: "#2d3748",
+  secondaryForeground: "#d1d5db",
+};
+
+export const tokens = {
+  borders: {
+    sm: 1,
+    md: 2,
+    lg: 3,
+  },
+  colors,
+  fontFamily: "System",
+  fontSizes: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 20,
+    xl_2: 24,
+    xl_3: 28,
+    xl_4: 32,
+    xl_5: 40,
+    xl_6: 48,
+  },
+  radii: {
+    xs: 4,
+    sm: 6,
+    md: 8,
+    lg: 12,
+    xl: 16,
+  },
+  spaces: {
+    xs_3: 2,
+    xs_2: 4,
+    xs: 8,
+    sm: 12,
+    md: 16,
+    lg: 20,
+    xl: 24,
+    xl_2: 32,
+    xl_3: 40,
+    xl_4: 48,
+    xl_5: 56,
+    xl_6: 64,
+  },
+};
+
+export type Tokens = typeof tokens;

@@ -8,42 +8,38 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { Pressable } from "../../components/pressable";
-import { colors } from "../../theme/colors";
+import { colors } from "../theme/tokens";
+import { Pressable } from "./pressable";
 
-export type BaseButtonProps = {
+export type ButtonBaseProps = {
   backgroundColor?: string;
   children?: ReactNode;
   color?: string;
   isDisabled?: boolean;
   isLoading?: boolean;
+  leadingComponent?: ReactNode;
   loadingComponent?: ReactNode;
   loadingPosition?: "start" | "center" | "end";
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
+  trailingComponent?: ReactNode;
 };
 
-export const BaseButton = ({
+export const ButtonBase = ({
   backgroundColor = colors.primary,
   children,
   color = colors.primaryForeground,
   isDisabled,
   isLoading,
+  leadingComponent,
   loadingComponent,
   loadingPosition = "center",
   onPress,
   style,
   textStyle,
-}: BaseButtonProps) => {
-  const [startComponent, centerComponent, endComponent] = useMemo(
-    () => [
-      ...(Array.isArray(children) ? children : [null, children]),
-      ...Array.from({ length: 3 }).fill(null),
-    ],
-    [children],
-  );
-
+  trailingComponent,
+}: ButtonBaseProps) => {
   const loadingComp = useMemo(
     () => loadingComponent || <ActivityIndicator color={color} />,
     [color, loadingComponent],
@@ -51,7 +47,7 @@ export const BaseButton = ({
 
   const renderChild = useCallback(
     (
-      position: Required<BaseButtonProps>["loadingPosition"],
+      position: Required<ButtonBaseProps>["loadingPosition"],
       component?: ReactNode,
     ) =>
       isLoading && loadingPosition === position ? (
@@ -69,10 +65,11 @@ export const BaseButton = ({
       isDisabled={isDisabled || isLoading}
       onPress={onPress}
       style={[styles.container, { backgroundColor }, style]}
+      withFeedback
     >
-      {renderChild("start", startComponent)}
-      {renderChild("center", centerComponent)}
-      {renderChild("end", endComponent)}
+      {renderChild("start", leadingComponent)}
+      {renderChild("center", children)}
+      {renderChild("end", trailingComponent)}
     </Pressable>
   );
 };
@@ -80,8 +77,11 @@ export const BaseButton = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    alignSelf: "stretch",
     flexDirection: "row",
+    justifyContent: "center",
     padding: 8,
+    width: "auto",
   },
   text: {
     color: colors.primaryForeground,

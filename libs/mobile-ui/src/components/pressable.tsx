@@ -8,22 +8,24 @@ import {
 export type PressableProps = Omit<RNPressableProps, "disabled"> & {
   activeOpacity?: number;
   isDisabled?: boolean;
+  withFeedback?: boolean;
 };
 
 export const Pressable = ({
   activeOpacity = 0.8,
   isDisabled,
   style,
+  withFeedback,
   ...rest
 }: PressableProps) => {
   const getStyles = useCallback(
     (state: PressableStateCallbackType) => {
       return [
         typeof style === "function" ? style(state) : style,
-        state.pressed && { opacity: activeOpacity },
+        withFeedback && state.pressed && { opacity: activeOpacity },
       ];
     },
-    [activeOpacity, style],
+    [activeOpacity, style, withFeedback],
   );
 
   return <RNPressable {...rest} disabled={isDisabled} style={getStyles} />;

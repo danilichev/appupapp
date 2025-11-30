@@ -1,10 +1,11 @@
-import { createContext, useMemo } from "react";
-import { StyleSheet } from "react-native-unistyles";
+import { createContext, FC, useContext, useMemo } from "react";
+import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
 
-import { Theme } from "../../theme";
-import { BaseButton, BaseButtonProps } from "./base";
+import { Theme } from "../theme";
+import { ButtonBase, ButtonBaseProps } from "./button-base";
+import { Icon, IconProps } from "./icon";
 
-export type ButtonProps = BaseButtonProps & {
+export type ButtonProps = ButtonBaseProps & {
   size?: "lg" | "md" | "sm";
   variant?: "outline" | "primary" | "secondary";
 };
@@ -20,15 +21,13 @@ export const Button = ({
   variant = "primary",
   ...rest
 }: ButtonProps) => {
-  styles.useVariants({ size, variant });
+  styles.useVariants({ isDisabled: rest.isDisabled, size, variant });
 
   const color = useMemo(() => rest.color || styles.text.color, [rest.color]);
 
-  console.log("color", color);
-
   return (
     <ButtonContext.Provider value={{ color, size, variant }}>
-      <BaseButton
+      <ButtonBase
         {...rest}
         color={color}
         style={[styles.container, style]}
@@ -38,9 +37,26 @@ export const Button = ({
   );
 };
 
+Button.Icon = ((props: IconProps) => {
+  const button = useContext(ButtonContext);
+  const theme = UnistylesRuntime.getTheme();
+
+  return (
+    <Icon
+      {...props}
+      color={props.color || button.color}
+      size={props.size || theme.spaces.lg}
+    />
+  );
+}) as FC<IconProps>;
+
 const styles = StyleSheet.create((theme: Theme) => ({
   container: {
     variants: {
+      isDisabled: {
+        false: {},
+        true: { opacity: 0.8 },
+      },
       size: {
         lg: {
           borderRadius: theme.radii.md,
